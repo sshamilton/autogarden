@@ -2,12 +2,14 @@ import influxdb_client, os, time
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 from influxdb_client.client.query_api import QueryApi
+import subprocess
+import datetime
 
-def getsensorvals(sa, sb, sc):
+def getsensorvals():
     token = os.environ.get("INFLUXDB_TOKEN")
     org = "home"
     url = "http://192.168.1.136:8086"
-
+    vals = [0,0,0]
     #write_client = influxdb_client.InfluxDBClient(url=url, token=token, org=org)
 
     #for value in range(5):
@@ -32,8 +34,7 @@ def getsensorvals(sa, sb, sc):
     tables = query_api.query(query, org="home")
     for table in tables:
       for record in table.records:
-        print("5 minute average moisture on sensor A: ")
-        vals[1] = record['_value']
+        vals[0] = record['_value']
 
 
     query = """from(bucket: "garden")
@@ -45,8 +46,7 @@ def getsensorvals(sa, sb, sc):
     tables = query_api.query(query, org="home")
     for table in tables:
       for record in table.records:
-        print("5 minute average moisture on sensor B: ")
-        vals[2] = record['_value']
+        vals[1] = record['_value']
 
     query = """from(bucket: "garden")
      |> range(start: -5m)
@@ -57,17 +57,29 @@ def getsensorvals(sa, sb, sc):
     tables = query_api.query(query, org="home")
     for table in tables:
       for record in table.records:
-        print("5 minute average moisture on sensor C: ")
-        vals[3] = record['_value']
-
+        vals[2] = record['_value']
+    return vals
 
 def main():
-    print("Begin")
-    svalues = getsensorvals()
-    print ("Sensor a: ", svalues[1])
-    if (svalues[3] > 250):
-        print("Time to water")
-    
+    while (True):
+        svalues = getsensorvals()
+        print ("Sensor a: ", svalues[0])
+        print ("Sensor b: ", svalues[1])
+        print ("Sensor c: ", svalues[2])
+        average = (svalues[0] + svalues[1] + svalues[2])/3
+        if (average > 250):
+            print("Time to water. Average is:" + str(average))
+            subprocess.run(["/home/stephen/garden/push.sh","Watering_AVG:" +str(average))
+            now = datetime.datetime.now()
+            print (now)
+            subprocess.run(["/home/stephen/garden/water-garden.sh"])
+        else:
+            print("Not watering, average is: " + str(average))
+            subprocess.run(["/home/stephen/garden/push.sh","Not-Watering_AVG:" +str(average))
+        now = datetime.datetime.now()
+        print(now)
+        print("Waiting for one hour")
+        time.sleep(60*60) 
 
 
 if __name__ == "__main__":
