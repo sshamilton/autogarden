@@ -5,7 +5,7 @@ This project uses InfluxDB, a time series database to store moisture values from
 As the ground becomes dry, the values rise, and the script turns on a Kasa smart switch that enables a pump to pump water into a rain barrel that waters the garden.
 
 A sample of the Arduino web data (this gets scraped by InfluxDB):
-{
+```
 #HELP analoga Analog Read from Arduino
 #TYPE analoga gauge
 analoga 302.0
