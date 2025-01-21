@@ -27,4 +27,4 @@ pressure 1023.72
 #HELP humidity Humidity in %
 #TYPE humidity gauge
 humidity 45.86
-}
+
