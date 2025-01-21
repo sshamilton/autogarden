@@ -69,13 +69,13 @@ def main():
         average = (svalues[0] + svalues[1] + svalues[2])/3
         if (average > 250):
             print("Time to water. Average is:" + str(average))
-            subprocess.run(["/home/stephen/garden/push.sh","Watering_AVG:" +str(average))
+            subprocess.run(["/home/stephen/garden/push.sh","Watering Average: " +str(average)])
             now = datetime.datetime.now()
             print (now)
-            subprocess.run(["/home/stephen/garden/water-garden.sh"])
+            #subprocess.run(["/home/stephen/garden/water-garden.sh"])
         else:
             print("Not watering, average is: " + str(average))
-            subprocess.run(["/home/stephen/garden/push.sh","Not-Watering_AVG:" +str(average))
+            subprocess.run(["/home/stephen/garden/push.sh","Not watering. Average: " +str(average)])
         now = datetime.datetime.now()
         print(now)
         print("Waiting for one hour")
